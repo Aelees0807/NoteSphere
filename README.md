@@ -27,5 +27,42 @@ The project is powered by **Node.js**, **Firebase Firestore**, **JWT Authenticat
 
 ---
 
+## 📂 Project Structure
 
-
+notes-app/
+├── backend/
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   └── notesController.js
+│   ├── middleware/
+│   │   └── authMiddleware.js
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   └── notesRoutes.js
+│   ├── .env
+│   ├── .gitignore
+│   ├── firebase-service-account.json  <-- IMPORTANT: Keep this secure
+│   ├── index.js
+│   └── package.json
+│
+└── frontend/
+    ├── public/
+    ├── src/
+    │   ├── components/
+    │   │   ├── Layout.jsx
+    │   │   ├── Navbar.jsx
+    │   │   ├── NoteCard.jsx
+    │   │   └── NoteModal.jsx
+    │   ├── pages/
+    │   │   ├── Home.jsx
+    │   │   ├── Login.jsx
+    │   │   └── Register.jsx
+    │   ├── App.jsx
+    │   ├── index.css
+    │   └── main.jsx
+    ├── .env
+    ├── .gitignore
+    ├── index.html
+    ├── package.json
+    ├── postcss.config.js
+    └── tailwind.config.js
