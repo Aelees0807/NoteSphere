@@ -27,5 +27,5 @@ The project is powered by **Node.js**, **Firebase Firestore**, **JWT Authenticat
 
 ---
 
-## 📂 Project Structure
+
 
