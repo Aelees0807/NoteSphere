@@ -1,0 +1,103 @@
+// frontend/src/pages/Register.jsx
+
+import { useState } from 'react';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../firebase';
+import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+export default function Register() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Handler for Email/Password Registration
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    if (password.length < 6) {
+        setError("Password must be at least 6 characters long.");
+        setLoading(false);
+        return;
+    }
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      const res = await axios.post(`${API_URL}/auth/register`, { email, password });
+      localStorage.setItem('token', res.data.token);
+      navigate('/');
+    } catch (err) {
+      setError(err.code === 'auth/email-already-in-use' ? "This email address is already in use." : "Failed to create an account.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Handler for Google Sign-Up
+  const handleGoogleRegister = async () => {
+    const provider = new GoogleAuthProvider();
+    setError('');
+    setLoading(true);
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Tell our backend to register this new user and get our custom JWT
+      const res = await axios.post(`${API_URL}/auth/register`, { email: user.email, password: 'provided_by_google' });
+      localStorage.setItem('token', res.data.token);
+      navigate('/');
+    } catch (err) {
+      setError("Failed to sign up with Google. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-full max-w-md p-8 space-y-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg">
+        <h2 className="text-3xl font-bold text-center text-charcoal-blue dark:text-white">Create Your Account</h2>
+        {error && <p className="text-neon-magenta text-center bg-black/30 p-2 rounded-md">{error}</p>}
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email and Password inputs remain the same */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 mt-2 text-gray-900 dark:text-white bg-black/10 dark:bg-black/20 border-gray-400/50 dark:border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue" required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2 mt-2 text-gray-900 dark:text-white bg-black/10 dark:bg-black/20 border-gray-400/50 dark:border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue" required />
+          </div>
+          <button type="submit" disabled={loading} className="w-full px-4 py-3 font-bold text-white bg-electric-blue rounded-md hover:bg-blue-700 transition-all duration-300 disabled:bg-gray-500">
+            {loading ? 'Creating Account...' : 'Register'}
+          </button>
+        </form>
+
+        {/* Separator */}
+        <div className="flex items-center">
+          <div className="flex-grow border-t border-gray-500/50"></div>
+          <span className="mx-4 text-sm text-gray-500">OR</span>
+          <div className="flex-grow border-t border-gray-500/50"></div>
+        </div>
+
+        {/* Google Sign-Up Button */}
+        <button onClick={handleGoogleRegister} disabled={loading} className="w-full flex items-center justify-center gap-3 px-4 py-3 font-bold text-charcoal-blue dark:text-white bg-white/80 dark:bg-black/20 border border-gray-400/50 dark:border-white/30 rounded-md hover:bg-white dark:hover:bg-black/30 transition-all duration-300 disabled:bg-gray-500">
+          <svg className="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.222 0-9.618-3.22-11.283-7.614l-6.522 5.025A20.02 20.02 0 0 0 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 36.49 44 30.683 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
+          Sign Up with Google
+        </button>
+        
+        <p className="text-sm text-center text-gray-700 dark:text-gray-300">
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium text-electric-blue hover:underline">Login</Link>
+        </p>
+      </div>
+    </div>
+  );
+}
