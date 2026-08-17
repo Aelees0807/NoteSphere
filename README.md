@@ -1,4 +1,4 @@
-# 📓 Notesphere – Secure Notes App with JWT Authentication
+# 📓 Notesphere – Secure Notes App
 
 Notesphere is a secure Notes Management application that allows users to create, read, update, and delete their personal notes.  
 The project is powered by **Node.js**, **Firebase Firestore**, **JWT Authentication**, and a **Tailwind CSS** frontend.
